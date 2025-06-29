@@ -1,4 +1,5 @@
 import random
+import traceback
 
 class CitizenAgent:
     def __init__(self, unique_id, model):
@@ -12,15 +13,19 @@ class CitizenAgent:
         self.defaulted = False
 
     def step(self):
-        self.applied_today = random.random() < 0.3  # 30% apply for loans
-        if self.approved and not self.defaulted:
-            default_risk = 0.05 * self.model.interest_rate / 10
-            if self.personality == "impulsive":
-                default_risk *= 2
-            elif self.personality == "disciplined":
-                default_risk *= 0.5
-            if random.random() < default_risk:
-                self.defaulted = True
+        try:
+            self.applied_today = random.random() < 0.3  # 30% apply for loans
+            if self.approved and not self.defaulted:
+                default_risk = 0.05 * self.model.interest_rate / 10
+                if self.personality == "impulsive":
+                    default_risk *= 2
+                elif self.personality == "disciplined":
+                    default_risk *= 0.5
+                if random.random() < default_risk:
+                    self.defaulted = True
+        except Exception as e:
+            print(f"[ERROR] Exception in CitizenAgent.step (agent_id={self.unique_id}):")
+            traceback.print_exc()
 
 class CityModel:
     def __init__(self, num_agents, interest_rate):
@@ -32,4 +37,8 @@ class CityModel:
     def step(self):
         self.day += 1
         for agent in self.agents:
-            agent.step()
+            try:
+                agent.step()
+            except Exception as e:
+                print(f"[ERROR] Exception in CityModel.step (agent_id={agent.unique_id}):")
+                traceback.print_exc()
