@@ -1,6 +1,6 @@
 import random
 import traceback
-
+# CitizenAgent class
 class CitizenAgent:
     def __init__(self, unique_id, model):
         self.unique_id = unique_id
